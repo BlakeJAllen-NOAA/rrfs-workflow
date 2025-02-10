@@ -618,7 +618,7 @@ if [ "${DO_SMOKE_DUST}" = "TRUE" ] && [ "${CYCLE_TYPE}" = "spinup" ]; then  # cy
   fi
   if [ "${if_cycle_smoke_dust}" = "TRUE" ] ; then
       # figure out which surface is available
-      surface_file_dir_name=fcst_fv3lam
+      surface_file_dir_name=fcst_fv3lam_spinup #changed from fcst_fv3lam since we don't want prod fields inserted into spinup data
       bkpath_find="missing"
       restart_prefix_find="missing"
       restart_prefix=$( date +%Y%m%d.%H0000. -d "${START_DATE}" )
@@ -686,12 +686,9 @@ if [ "${DO_SMOKE_DUST}" = "TRUE" ] && [ "${CYCLE_TYPE}" = "spinup" ]; then  # cy
   fi
 fi
 
-#-----------------------------------------------------------------------
-#
-#  smoke/dust cycling for Retros
-#
-#-----------------------------------------------------------------------
-
+#No DA, no spin up cycle, smoke/dust cycling RETROS
+#how is this block used if there is DA and spinup? add_smoke.py appears hardcoded to modify the external IC file that only exists at 3Z/15Z
+#add_smoke.py fails without changing anything on hours the external IC file doesn't exist, though.
 if [ "${DO_SMOKE_DUST}" = "TRUE" ]; then
       surface_file_dir_name=fcst_fv3lam
       bkpath_find="missing"
@@ -746,7 +743,7 @@ if [ "${DO_SMOKE_DUST}" = "TRUE" ]; then
         fi
         echo "${YYYYMMDDHH}(${CYCLE_TYPE}): cycle smoke/dust from ${checkfile} " >> ${EXPTDIR}/log.cycles
       fi
- cat << EOF > add_smoke.py
+cat << EOF > add_smoke.py
 import xarray as xr
 import numpy as np
 import os
@@ -770,8 +767,10 @@ def populate_data(data, target_shape):
 def main():
     # File paths
     source_file = "fv_tracer.res.tile1.nc"
-    target_file = 'gfs_data.tile7.halo0.nc'
-
+    target_file = 'gfs_data.tile7.halo0.nc' #maybe this script should only run for the cold start time; the "if [ DO_SMOKE_DUST ]" block above handles this otherwise
+    #maybe the purpose of this script is to update the cold start IC gfs_data file?
+    #target_file = '/scratch2/BMC/zrtrr/bjallen/JEDI-AOD/RRFS_AOD_ParkFire_testing/v0.7.7/nwges/2024072009/fcst_fv3lam_spinup/RESTART/20240720.150000.fv_tracer.res.tile1.nc' #previous cycle
+    #target_file = "${checkfile}"
     # Check if the source file exists
     if not os.path.exists(source_file):
         print(f"Source file '{source_file}' does not exist. Exiting...")
@@ -813,12 +812,12 @@ def main():
     file_input['smoke'] = smoke_zero
     file_input['dust'] = dust_zero
     file_input['coarsepm']= coarsepm_zero
-    file_input.close()
 
     # Populate the variables with the adjusted data
     file_input['smoke'][1:66,:,:] = smoke_2_add
     file_input['dust'][1:66,:,:] = dust_2_add
     file_input['coarsepm'][1:66,:,:] = coarsepm_2_add
+    file_input.close()
 
     # Save the modified dataset back to the file
     file_input.to_netcdf(target_file, mode='w')
@@ -835,9 +834,11 @@ if __name__ == "__main__":
 
 EOF
 
-#/contrib/anaconda/anaconda3/latest/bin/python  add_smoke.py
-/scratch1/BMC/acomp/Johana/miniconda/bin/python add_smoke.py
-fi     
+#make following conditional on cold start? no need to change now since it just fails before writing anything
+/contrib/anaconda/anaconda3/latest/bin/python  add_smoke.py
+fi
+# ends smoke/dust cycling RETROS
+
 #
 #-----------------------------------------------------------------------
 #
@@ -903,7 +904,8 @@ if [ ${SFC_CYC} -eq 1 ] || [ ${SFC_CYC} -eq 2 ] ; then  # cycle surface fields
           YYYYMMDDHHmInterv=$( date +%Y%m%d%H -d "${START_DATE} ${offset_hours} hours ago" )
 
           n=${DA_CYCLE_INTERV}
-          while [[ $n -le 2 ]] ; do
+          while [[ $n -le 2 ]] ; do   # I think this should run for my case, maybe? check if the sync file the prior block looks for exists. 
+                                      # Also, what is with the suffix here, I don't have anything like that I dont think 
             if [ "${IO_LAYOUT_Y}" = "1" ]; then
               checkfile=${surface_file_path}/${restart_prefix}sfc_data.nc.${YYYYMMDDHHmInterv}
             else
@@ -1006,7 +1008,8 @@ if [ "${CYCLE_TYPE}" = "spinup" ]; then
   if [ ${HH} -eq ${GVF_update_hour} ]; then
     Update_GVF=1
   fi
-  if [ ${HH} -eq "03" ] ||  [ ${HH} -eq "15" ]; then
+  #if [ ${HH} -eq "03" ] ||  [ ${HH} -eq "15" ]; then   # bingo, this is treating 15Z as a cold start hour
+  if [ ${HH} -eq "03" ]; then   # my version is only cold starting at 3Z
     Update_GVF=2
   fi
 fi
@@ -1120,8 +1123,9 @@ else
   end_search_hr=$(( 12 + ${EXTRN_MDL_LBCS_SEARCH_OFFSET_HRS} ))
   YYYYMMDDHHmInterv=$(date +%Y%m%d%H -d "${START_DATE} ${n} hours ago")
   lbcs_path=${lbcs_root}/${YYYYMMDDHHmInterv}${SLASH_ENSMEM_SUBDIR}/lbcs
-  while [[ $n -le ${end_search_hr} ]] ; do
-    last_bdy_time=$(( n + ${FCST_LEN_HRS_thiscycle} ))
+  #while [[ $n -le ${end_search_hr} ]] ; do
+  while [[ $n -le 24 ]] ; do  
+  last_bdy_time=$(( n + ${FCST_LEN_HRS_thiscycle} ))
     last_bdy=$(printf %3.3i $last_bdy_time)
     checkfile=${lbcs_path}/${bndy_prefix}.${last_bdy}.nc
     if [ -r "${checkfile}" ]; then

@@ -101,7 +101,8 @@ if [[ $DO_RETRO == "TRUE" ]] ; then
   fi
 
   if [[ $MACHINE == "hera" ]] ; then
-    RETRODATAPATH="/scratch2/BMC/zrtrr/RRFS_RETRO_DATA"
+    RETRODATAPATH="/scratch1/BMC/acomp/Liam/data/parkFireJul20DATest"
+    STAGEDATAPATH="/scratch1/BMC/acomp/Liam/code/rrfs-stagedata/"
     if [[ ${DO_ENSEMBLE} == "TRUE" ]]; then
       if [[ ${EXTRN_MDL_NAME_ICS} == "GEFS" ]]; then
         EXTRN_MDL_SOURCE_BASEDIR_ICS="${RETRODATAPATH}/GEFS"
@@ -118,24 +119,26 @@ if [[ $DO_RETRO == "TRUE" ]] ; then
         EXTRN_MDL_SOURCE_BASEDIR_LBCS="${RETRODATAPATH}/FV3GFS"
       fi
     else
-      EXTRN_MDL_SOURCE_BASEDIR_ICS=/scratch2/BMC/acomp/Sudheer/Fire-nest/ICs_LBCs/RAP # ${RETRODATAPATH}/gfs/0p25deg/grib2
-      EXTRN_MDL_SOURCE_BASEDIR_LBCS=/scratch2/BMC/acomp/Sudheer/Fire-nest/ICs_LBCs/RAP # ${RETRODATAPATH}/gfs/0p25deg/grib2
+      #EXTRN_MDL_SOURCE_BASEDIR_ICS=/scratch2/BMC/acomp/Liam/data/parkFire/obs/RAP
+      #EXTRN_MDL_SOURCE_BASEDIR_LBCS=/scratch2/BMC/acomp/Liam/data/parkFire/obs/RAP
+      EXTRN_MDL_SOURCE_BASEDIR_ICS=/scratch2/BMC/zrtrr/bjallen/JEDI-AOD/RAP_IC_LBC
+      EXTRN_MDL_SOURCE_BASEDIR_LBCS=/scratch2/BMC/zrtrr/bjallen/JEDI-AOD/RAP_IC_LBC
     fi
 
-    OBSPATH=${RETRODATAPATH}/obs_rap
-    OBSPATH_NSSLMOSIAC=${RETRODATAPATH}/reflectivity
-    OBSPATH_PM=${RETRODATAPATH}/pm
+    OBSPATH=${STAGEDATAPATH}/obs_rap
+    OBSPATH_NSSLMOSIAC=/scratch1/BMC/acomp/Liam/code/rrfs-stagedata/tmp/refl_2/reflect
+    OBSPATH_PM=${STAGEDATAPATH}/pm
     LIGHTNING_ROOT=${RETRODATAPATH}/lightning
     GLMFED_EAST_ROOT=${RETRODATAPATH}/sat/nesdis/goes-east/glm/full-disk
     GLMFED_WEST_ROOT=${RETRODATAPATH}/sat/nesdis/goes-east/glm/full-disk
-    ENKF_FCST=${RETRODATAPATH}/enkf/atm
+    ENKF_FCST=${RETRODATAPATH}/GDAS
     AIRCRAFT_REJECT=${RETRODATAPATH}/amdar_reject_lists
     SFCOBS_USELIST=${RETRODATAPATH}/mesonet_uselists
     SST_ROOT=${RETRODATAPATH}/highres_sst
     GVF_ROOT=${RETRODATAPATH}/gvf/grib2
     IMSSNOW_ROOT=${RETRODATAPATH}/snow/ims96/grib2
     RAPHRRR_SOIL_ROOT=${RETRODATAPATH}/rap_hrrr_soil
-    FIRE_RAVE_DIR=/scratch2/BMC/acomp/Sudheer/Fire-nest/newRAVE/hourly #${RETRODATAPATH}/RAVE_RAW
+    FIRE_RAVE_DIR=/scratch1/BMC/acomp/Johana/rrfs-da-retros-test/obs/RAVE #/scratch2/BMC/acomp/Sudheer/Fire-nest/newRAVE/hourly
   fi
   if [[ $MACHINE == "orion" ]] || [[ $MACHINE == "hercules" ]] ; then
     if [[ ${DO_ENSEMBLE} == "TRUE" ]]; then
