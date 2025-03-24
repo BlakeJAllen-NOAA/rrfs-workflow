@@ -65,18 +65,24 @@ fi
 if [[ $DO_RETRO == "TRUE" ]] ; then
 
   if [[ $MACHINE == "jet" ]] ; then
-    RETRODATAPATH="/lfs4/BMC/wrfruc/RRFS_RETRO_DATA"
+    #RETRODATAPATH="/lfs4/BMC/wrfruc/RRFS_RETRO_DATA"
+    RETRODATAPATH="/lfs5/BMC/wrfruc/bjallen/JEDI-AOD/Park_Retro_Fix"
+    STAGEDATAPATH="/lfs5/BMC/wrfruc/bjallen/JEDI-AOD/Park_Retro_Fix/rrfs-stagedata/"
     if [ ${EXTRN_MDL_NAME_ICS} == "FV3GFS" ] ; then
       EXTRN_MDL_SOURCE_BASEDIR_ICS=${RETRODATAPATH}/gfs/0p25deg/grib2
     elif [ ${EXTRN_MDL_NAME_ICS} == "GEFS" ] ; then
       EXTRN_MDL_SOURCE_BASEDIR_ICS=${RETRODATAPATH}/GEFS
     elif [[ ${EXTRN_MDL_NAME_ICS} == "GDASENKF" ]]; then
         EXTRN_MDL_SOURCE_BASEDIR_ICS="${RETRODATAPATH}/enkf/atm"
+    elif [[ ${EXTRN_MDL_SOURCE_BASEDIR_ICS} == "RAP" ]]; then
+        EXTRN_MDL_SOURCE_BASEDIR_ICS=/lfs5/BMC/wrfruc/bjallen/JEDI-AOD/RAP_IC_LBC
     fi
     if [ ${EXTRN_MDL_NAME_LBCS} == "FV3GFS" ] ; then
       EXTRN_MDL_SOURCE_BASEDIR_LBCS=${RETRODATAPATH}/gfs/0p25deg/grib2
     elif [ ${EXTRN_MDL_NAME_LBCS} == "GEFS" ] ; then
       EXTRN_MDL_SOURCE_BASEDIR_LBCS=${RETRODATAPATH}/GEFS
+    elif [ ${EXTRN_MDL_NAME_LBCS} == "RAP" ] ; then
+      EXTRN_MDL_SOURCE_BASEDIR_LBCS=/lfs5/BMC/wrfruc/bjallen/JEDI-AOD/RAP_IC_LBC
     fi
     if [[ $GLMFED_DATA_MODE == "FULL" ]] ; then
       GLMFED_EAST_ROOT=${RETRODATAPATH}/sat/nesdis/goes-east/glm/full-disk
@@ -85,19 +91,24 @@ if [[ $DO_RETRO == "TRUE" ]] ; then
       GLMFED_EAST_ROOT=${RETRODATAPATH}/sat/noaaport/goes-east/glm/tiled
       GLMFED_WEST_ROOT=${RETRODATAPATH}/sat/noaaport/goes-west/glm/tiled
     fi
-
-    OBSPATH=${RETRODATAPATH}/obs_rap
-    OBSPATH_PM=${RETRODATAPATH}/pm
-    OBSPATH_NSSLMOSIAC=${RETRODATAPATH}/reflectivity
+    
+    EXTRN_MDL_SOURCE_BASEDIR_ICS=/lfs5/BMC/wrfruc/bjallen/JEDI-AOD/RAP_IC_LBC
+    EXTRN_MDL_SOURCE_BASEDIR_LBCS=/lfs5/BMC/wrfruc/bjallen/JEDI-AOD/RAP_IC_LBC
+    
+    OBSPATH=${STAGEDATAPATH}/obs_rap
+    OBSPATH_PM=${STAGEDATAPATH}/pm
+    OBSPATH_NSSLMOSIAC=${STAGEDATAPATH}/tmp/refl_2/reflect
     LIGHTNING_ROOT=${RETRODATAPATH}/lightning
-    ENKF_FCST=${RETRODATAPATH}/enkf/atm
+    GLMFED_EAST_ROOT=${RETRODATAPATH}/sat/nesdis/goes-east/glm/full-disk
+    GLMFED_WEST_ROOT=${RETRODATAPATH}/sat/nesdis/goes-east/glm/full-disk
+    ENKF_FCST=${RETRODATAPATH}/GDAS
     AIRCRAFT_REJECT=${RETRODATAPATH}/amdar_reject_lists
     SFCOBS_USELIST=${RETRODATAPATH}/mesonet_uselists
     SST_ROOT=${RETRODATAPATH}/highres_sst
     GVF_ROOT=${RETRODATAPATH}/gvf/grib2
     IMSSNOW_ROOT=${RETRODATAPATH}/snow/ims96/grib2
     RAPHRRR_SOIL_ROOT=${RETRODATAPATH}/rap_hrrr_soil
-    FIRE_RAVE_DIR=${RETRODATAPATH}/RAVE_RAW
+    FIRE_RAVE_DIR=${RETRODATAPATH}/RAVE
   fi
 
   if [[ $MACHINE == "hera" ]] ; then

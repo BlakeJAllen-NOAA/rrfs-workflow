@@ -835,7 +835,7 @@ if __name__ == "__main__":
 EOF
 
 #make following conditional on cold start? no need to change now since it just fails before writing anything
-/contrib/anaconda/anaconda3/latest/bin/python  add_smoke.py
+python  add_smoke.py
 fi
 # ends smoke/dust cycling RETROS
 
