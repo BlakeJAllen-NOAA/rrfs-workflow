@@ -169,6 +169,7 @@ if [[ ${PREDEF_GRID_NAME} == "RRFS_CONUS_3km" ]] ; then
   PPN_RUN_POSTANAL="5"
 
   if [[ $MACHINE == "jet" ]] ; then
+    NATIVE_RUN_ANALYSIS="--cpus-per-task 4 --exclusive"
     if [[ -n $RESERVATION ]] ; then
       NNODES_MAKE_ICS="3"
       PPN_MAKE_ICS="20"
