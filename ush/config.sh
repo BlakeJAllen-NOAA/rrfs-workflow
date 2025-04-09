@@ -1,7 +1,7 @@
 MACHINE="jet"
 version="v0.7.7"
 #RESERVATION="rrfsdet"
-EXPT_BASEDIR="/lfs5/BMC/wrfruc/bjallen/JEDI-AOD/RRFS_AOD_ParkFire_ctrl_hrly/${version}"
+EXPT_BASEDIR="/lfs5/BMC/wrfruc/bjallen/JEDI-AOD/RRFS_AOD_ParkFire_DAexp1/${version}"
 EXPT_SUBDIR="RRFS_CONUS_3km"
 
 PREDEF_GRID_NAME=RRFS_CONUS_3km
@@ -35,7 +35,8 @@ USE_CLM="TRUE"
 DO_PARALLEL_PRDGEN="FALSE"
 DO_GSIDIAG_OFFLINE="FALSE"
 DO_UPDATE_BC="FALSE"
-
+DO_JEDI_GLM_DA="FALSE"
+DO_JEDI_AOD_DA="TRUE"
 
 ### NOTE: config_defaults.sh contains a lot of documentation for the options ###
 

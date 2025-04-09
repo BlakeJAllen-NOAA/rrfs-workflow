@@ -65,13 +65,12 @@ Workflow task names.
 <!ENTITY ADD_AEROSOL_TN          "{{ add_aerosol_tn }}">
 <!ENTITY HOFX_LIGHTNING_TN       "{{ HofX_lightning }}">
 <!ENTITY JEDI_LIGHTNING_TN       "{{ JEDI_lightning }}">
-<!ENTITY JEDI_IC_TN              "{{ JEDI_IC }}">
-<!ENTITY GLM_TO_FV3JEDI_LIGHTNING_TN "{{ GLM_to_fv3jedi_lightning }}">
+<!ENTITY JEDI_IC_GLM_TN              "{{ JEDI_IC_GLM }}">
+<!ENTITY GLM_TO_IODA_LIGHTNING_TN "{{ GLM_to_ioda_lightning }}">
+<!ENTITY HOFX_AOD_TN       "{{ HofX_AOD }}">
 <!ENTITY JEDI_AOD_TN       "{{ JEDI_AOD }}">
-<!-- is the below needed for Aerosol DA?
-<!ENTITY JEDI_IC_TN              "{{ JEDI_IC }}">
--->
-<!ENTITY VIIRS_TO_IODA_AOD_TN "{{ VIIRS_to_IODA_AOD }}">
+<!ENTITY VIIRS_TO_IODA_AOD_TN "{{ VIIRS_to_ioda_aod }}">
+<!ENTITY JEDI_IC_AOD_TN              "{{ JEDI_IC_AOD }}">
 
 <!ENTITY RUN_PREPSTART_TN     "run_prepstart">
 <!ENTITY RUN_ANALYSIS_TN      "run_analysis_gsi">
@@ -126,16 +125,16 @@ Directories and files.
 {%- endif %}
 <!ENTITY GLOBAL_VAR_DEFNS_FP      "{{ global_var_defns_fp }}">
 <!ENTITY LOAD_MODULES_RUN_TASK_FP "{{ load_modules_run_task_fp }}">
+
+
 {%- if do_jedi_glm_da %}
-<!ENTITY FV3JEDI_BINDIR           "{{ fv3jedi_bin_fp }}">
-<!ENTITY JEDI_MODULES             "{{ jedi_module_fp }}">
+<!ENTITY FV3JEDI_BINDIR           "{{ fv3jedi_bindir_fp }}">
+<!ENTITY JEDI_MODULES             "{{ jedi_modules_fp }}">
 {%- endif %}
 {%- if do_jedi_aod_da %}
-<!ENTITY FV3JEDI_BINDIR           "{{ fv3jedi_bin_fp }}">
-<!ENTITY JEDI_MODULES             "{{ jedi_module_fp }}">
+<!ENTITY FV3JEDI_BINDIR           "{{ fv3jedi_bindir_fp }}">
+<!ENTITY JEDI_MODULES             "{{ jedi_modules_fp }}">
 {%- endif %}
-
-
 
 <!--
 Reservation types.  Reservations specify the queue/partition and account
@@ -668,12 +667,9 @@ MODULES_RUN_TASK_FP script.
 {%- endif %}
 
 {%- if do_jedi_glm_da %}
-<!--
-************************************************************************
-************************************************************************
--->
 
-  <task name="&GLM_TO_FV3JEDI_LIGHTNING_TN;_#type#" cycledefs="#cycletype#"  maxtries="{{ maxtries_GLM_to_fv3jedi_lightning }}">
+
+  <task name="&GLM_TO_IODA_LIGHTNING_TN;_#type#" cycledefs="#cycletype#"  maxtries="{{ maxtries_GLM_to_ioda_lightning }}">
 
     &RSRV_DEFAULT;
     &WALL_LIMIT_ANALYSIS;
@@ -683,8 +679,8 @@ MODULES_RUN_TASK_FP script.
     &NATIVE_ALL;
     <walltime>&WALLTIME_PROC_LIGHTNING;</walltime>
     &NODESIZE_ALL;
-    <jobname><cyclestr>&TAG;_&GLM_TO_FV3JEDI_LIGHTNING_TN;_#type#</cyclestr></jobname>
-    <join><cyclestr>&LOGDIR;/&GLM_TO_FV3JEDI_LIGHTNING_TN;_#type#_&TAG;_@Y@m@d@H.log</cyclestr></join>
+    <jobname><cyclestr>&TAG;_&GLM_TO_IODA_LIGHTNING_TN;_#type#</cyclestr></jobname>
+    <join><cyclestr>&LOGDIR;/&GLM_TO_IODA_LIGHTNING_TN;_#type#_&TAG;_@Y@m@d@H.log</cyclestr></join>
 
     <envar><name>GLOBAL_VAR_DEFNS_FP</name><value>&GLOBAL_VAR_DEFNS_FP;</value></envar>
     <envar><name>ATIME</name><value><cyclestr>@Y@m@d@H@M</cyclestr></value></envar>
@@ -699,10 +695,6 @@ MODULES_RUN_TASK_FP script.
   </task>
 
 
-<!--
-************************************************************************
-************************************************************************
--->
 
 
   <task name="&HOFX_LIGHTNING_TN;_#type#" cycledefs="#cycletype#"  maxtries="{{ maxtries_HofX_lightning }}">
@@ -718,7 +710,6 @@ MODULES_RUN_TASK_FP script.
 
     <envar><name>GLOBAL_VAR_DEFNS_FP</name><value>&GLOBAL_VAR_DEFNS_FP;</value></envar>
     <envar><name>ANL_TIME</name><value><cyclestr>@Y@m@d@H@M</cyclestr></value></envar>
-    <!-- LX * LY must be the same as the number of cores requested -->
     <envar><name>LX</name><value>2</value></envar>
     <envar><name>LY</name><value>2</value></envar>
     <envar><name>WORK_DIR</name><value><cyclestr>&CYCLE_BASEDIR;/@Y@m@d@H/GLM_lightning/@M/HofX_#type#</cyclestr></value></envar>
@@ -732,17 +723,12 @@ MODULES_RUN_TASK_FP script.
 
     <dependency>
       <and>
-	<taskdep task="&GLM_TO_FV3JEDI_LIGHTNING_TN;_#type#"/>
+	<taskdep task="&GLM_TO_IODA_LIGHTNING_TN;_#type#"/>
        <taskdep task="&POSTANAL_TN;_#type#"/>
-        <!-- <datadep age="02:00">&CYCLE_BASEDIR;/<cyclestr>@Y@m@d@H</cyclestr>/fcst_fv3lam_spinup/INPUT/coupler.res</datadep> if GSI ran, this is 2 minutes old. -->
       </and>
     </dependency>
   </task>
 
-<!--
-************************************************************************
-************************************************************************
--->
 
   <task name="&JEDI_LIGHTNING_TN;_#type#" cycledefs="#cycletype#"  maxtries="{{ maxtries_JEDI_lightning }}">
 
@@ -758,8 +744,6 @@ MODULES_RUN_TASK_FP script.
 
     <envar><name>GLOBAL_VAR_DEFNS_FP</name><value>&GLOBAL_VAR_DEFNS_FP;</value></envar>
     <envar><name>ANL_TIME</name><value><cyclestr>@Y@m@d@H@M</cyclestr></value></envar>
-    <!-- LX * LY must be the same as the number of cores requested -->
-    <!-- this must also be equal to the number of cores used when BUMP  was run -->
     <envar><name>LX</name><value>20</value></envar>
     <envar><name>LY</name><value>20</value></envar>
     <envar><name>WORK_DIR</name><value><cyclestr>&CYCLE_BASEDIR;/@Y@m@d@H/FV3JEDI_#type#/@M</cyclestr></value></envar>
@@ -780,30 +764,24 @@ MODULES_RUN_TASK_FP script.
 
   </task>
 
-<!--
-************************************************************************
-************************************************************************
--->
 
-  <task name="&JEDI_IC_TN;_#type#" cycledefs="#cycletype#"  maxtries="{{ maxtries_JEDI_IC }}">
+  <task name="&JEDI_IC_GLM_TN;_#type#" cycledefs="#cycletype#"  maxtries="{{ maxtries_JEDI_IC_GLM }}">
 
     &RSRV_DEFAULT;
     &WALL_LIMIT_ANALYSIS;
 
-    <command>&LOAD_MODULES_RUN_TASK_FP; "JEDI_IC" "&JOBSdir;/JRRFS_modify_ICs.sh"</command>
-    <cores>{{ ncores_JEDI_IC }}</cores>
+    <command>&LOAD_MODULES_RUN_TASK_FP; "JEDI_IC_GLM" "&JOBSdir;/JRRFS_modify_ICs.sh"</command>
+    <cores>{{ ncores_JEDI_IC_GLM }}</cores>
     <native>--exclusive</native>
     &NATIVE_ALL;
     <walltime>&WALLTIME_PROC_LIGHTNING;</walltime>
     &NODESIZE_ALL;
-    <jobname>&TAG;_&JEDI_IC_TN;_#type#</jobname>
-    <join><cyclestr>&LOGDIR;/&JEDI_IC_TN;_#type#_&TAG;_@Y@m@d@H.log</cyclestr></join>
+    <jobname>&TAG;_&JEDI_IC_GLM_TN;_#type#</jobname>
+    <join><cyclestr>&LOGDIR;/&JEDI_IC_GLM_TN;_#type#_&TAG;_@Y@m@d@H.log</cyclestr></join>
 
     <envar><name>GLOBAL_VAR_DEFNS_FP</name><value>&GLOBAL_VAR_DEFNS_FP;</value></envar>
     <envar><name>ATIME</name><value><cyclestr>@Y@m@d@H@M</cyclestr></value></envar>
-    <!-- JEDI_DIR should be the same as OUT_DIR from the JEDI_lightning task -->
     <envar><name>JEDI_DIR</name><value><cyclestr>&CYCLE_BASEDIR;/@Y@m@d@H/FV3JEDI_#type#/@M</cyclestr></value></envar>
-    <!-- PREFIX should be the same as FV3JEDI_lightning_DESC from the JEDI_lightning task -->
     <envar><name>PREFIX</name><value>lightning</value></envar>
     <envar><name>DEST_DIR</name><value>&CYCLE_BASEDIR;/<cyclestr>@Y@m@d@H</cyclestr></value></envar>
     <envar><name>NWGES_ROOT_M1H</name><value>&NWGES_BASEDIR;/<cyclestr offset="-01:00:00">@Y@m@d@H</cyclestr></value></envar>
@@ -816,15 +794,13 @@ MODULES_RUN_TASK_FP script.
   </task>
 
 {%- endif %}
+-->
+
 
 {%- if do_jedi_aod_da %}
 
-<!--
-************************************************************************
-************************************************************************
--->
 
-  <task name="&VIIRS_TO_IODA_AOD_TN;_#type#" cycledefs="#cycletype#"  maxtries="{{ maxtries_VIIRS_to_IODA_AOD }}">
+  <task name="&VIIRS_TO_IODA_AOD_TN;_#type#" cycledefs="#cycletype#"  maxtries="{{ maxtries_VIIRS_to_ioda_aod }}">
 
     &RSRV_DEFAULT;
     &WALL_LIMIT_ANALYSIS;
@@ -850,14 +826,10 @@ MODULES_RUN_TASK_FP script.
   </task>
 
 
-<!--
-************************************************************************
-************************************************************************
--->
 
   <task name="&JEDI_AOD_TN;_#type#" cycledefs="#cycletype#"  maxtries="{{ maxtries_JEDI_lightning }}">
 
-    <command>&LOAD_MODULES_RUN_TASK_FP; "JEDI_AOD" "&JOBSdir;/JRRFS_fv3jedi_aod.sh"</command>
+    <command>&LOAD_MODULES_RUN_TASK_FP; "JEDI_AOD" "&JOBSdir;/JRRFS_ioda_aod.sh"</command>
 
     &RSRV_DEFAULT;
     <nodes>{{ nnodes_JEDI_AOD }}:ppn={{ ppn_JEDI_AOD }}</nodes>
@@ -869,8 +841,6 @@ MODULES_RUN_TASK_FP script.
 
     <envar><name>GLOBAL_VAR_DEFNS_FP</name><value>&GLOBAL_VAR_DEFNS_FP;</value></envar>
     <envar><name>ANL_TIME</name><value><cyclestr>@Y@m@d@H@M</cyclestr></value></envar>
-    <!-- LX * LY must be the same as the number of cores requested -->
-    <!-- this must also be equal to the number of cores used when BUMP  was run -->
     <envar><name>LX</name><value>20</value></envar>
     <envar><name>LY</name><value>20</value></envar>
     <envar><name>WORK_DIR</name><value><cyclestr>&CYCLE_BASEDIR;/@Y@m@d@H/FV3JEDI_#type#/@M</cyclestr></value></envar>
@@ -884,15 +854,12 @@ MODULES_RUN_TASK_FP script.
     <envar><name>FV3JEDI_AOD_DESC</name><value>AOD</value></envar>
     <envar><name>FV3FCST_TYPE</name><value>#type#</value></envar>
 
-    <dependency>
-        <taskdep task="&HOFX_LIGHTNING_TN;_#type#"/>
-    </dependency>
-
   </task>
 
 
 
 {%- endif %}
+-->
 
 {%- if do_glmfed_da %}
 
@@ -1845,11 +1812,12 @@ MODULES_RUN_TASK_FP script.
       <and>
         <taskdep task="&PROCESS_BUFR_TN;_spinup"/>
        {%- if do_jedi_glm_da %}
-        <taskdep task="&JEDI_IC_TN;_spinup{{ uscore_ensmem_name }}"/>
+        <taskdep task="&JEDI_IC_GLM_TN;_spinup{{ uscore_ensmem_name }}"/>
        {%- endif %}
        {%- if do_jedi_aod_da %}
-        <taskdep task="&JEDI_AOD_TN;_spinup{{ uscore_ensmem_name }}"/>
+        <taskdep task="&JEDI_IC_AOD_TN;_spinup{{ uscore_ensmem_name }}"/>
        {%- endif %}
+  
         {%- if do_enkfupdate %}
         <and>
            {%- if do_enkf_radar_ref %}
@@ -2256,11 +2224,12 @@ MODULES_RUN_TASK_FP script.
       <and>
         <taskdep task="&PROCESS_BUFR_TN;_spinup"/>
        {%- if do_jedi_glm_da %}
-        <taskdep task="&JEDI_IC_TN;_spinup{{ uscore_ensmem_name }}"/>
+        <taskdep task="&JEDI_IC_GLM_TN;_spinup{{ uscore_ensmem_name }}"/>
        {%- endif %}
        {%- if do_jedi_aod_da %}
-        <taskdep task="&JEDI_AOD_TN;_spinup{{ uscore_ensmem_name }}"/>
+        <taskdep task="&JEDI_IC_AOD_TN;_spinup{{ uscore_ensmem_name }}"/>
        {%- endif %}
+
         {%- if do_enkfupdate %}
         <and>
            {%- if do_enkf_radar_ref %}
@@ -3232,12 +3201,14 @@ MODULES_RUN_TASK_FP script.
     <dependency>
       <and>
         <taskdep task="&PROCESS_BUFR_TN;_prod"/>
+
        {%- if do_jedi_glm_da %}
-        <taskdep task="&JEDI_IC_TN;_prod{{ uscore_ensmem_name }}"/>
+        <taskdep task="&JEDI_IC_GLM_TN;_prod{{ uscore_ensmem_name }}"/>
        {%- endif %}
        {%- if do_jedi_aod_da %}
-        <taskdep task="&JEDI_AOD_TN;_prod{{ uscore_ensmem_name }}"/>
+        <taskdep task="&JEDI_IC_AOD_TN;_prod{{ uscore_ensmem_name }}"/>
        {%- endif %}
+
         {%- if do_enkfupdate %}
         <and>
            {%- if do_enkf_radar_ref %}
