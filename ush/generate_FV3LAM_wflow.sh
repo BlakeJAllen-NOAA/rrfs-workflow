@@ -151,6 +151,8 @@ WFLOW_XML_FP="$EXPTDIR/${WFLOW_XML_FN}"
 #
 #-----------------------------------------------------------------------
 #
+echo "The do_jedi_aod_da variable is: ${DO_JEDI_AOD_DA}"
+
 ensmem_indx_name="\"\""
 uscore_ensmem_name="\"\""
 slash_ensmem_subdir="\"\""

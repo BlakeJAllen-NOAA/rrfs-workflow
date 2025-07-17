@@ -1,4 +1,4 @@
-y{#
+{#
 
 This is a Jinja-enabled Rocoto XML template. It is filled in using the
 fill_template.py script, and is done automatically by the
@@ -277,6 +277,7 @@ define resources used for each tasks
 <!ENTITY WALLTIME_PROC_PM         "{{ wtime_proc_pm }}">
 <!ENTITY WALLTIME_PROC_RADAR      "{{ wtime_proc_radar }}">
 <!ENTITY WALLTIME_PROC_LIGHTNING  "{{ wtime_proc_lightning }}">
+<!ENTITY WALLTIME_PROC_AOD        "{{ wtime_proc_lightning }}">
 <!ENTITY WALLTIME_PROC_BUFR       "{{ wtime_proc_bufr }}">
 <!ENTITY WALLTIME_PREP_CYC        "{{ wtime_run_prepstart }}">
 <!ENTITY WALLTIME_SAVE_RESTART    "{{ wtime_save_restart }}">
@@ -667,7 +668,10 @@ MODULES_RUN_TASK_FP script.
 {%- endif %}
 
 {%- if do_jedi_glm_da %}
-
+<!--
+************************************************************************
+************************************************************************
+-->
 
   <task name="&GLM_TO_IODA_LIGHTNING_TN;_#type#" cycledefs="#cycletype#"  maxtries="{{ maxtries_GLM_to_ioda_lightning }}">
 
@@ -694,8 +698,10 @@ MODULES_RUN_TASK_FP script.
 
   </task>
 
-
-
+<!--
+************************************************************************
+************************************************************************
+-->
 
   <task name="&HOFX_LIGHTNING_TN;_#type#" cycledefs="#cycletype#"  maxtries="{{ maxtries_HofX_lightning }}">
 
@@ -728,6 +734,11 @@ MODULES_RUN_TASK_FP script.
       </and>
     </dependency>
   </task>
+
+<!--
+************************************************************************
+************************************************************************
+-->
 
 
   <task name="&JEDI_LIGHTNING_TN;_#type#" cycledefs="#cycletype#"  maxtries="{{ maxtries_JEDI_lightning }}">
@@ -764,6 +775,11 @@ MODULES_RUN_TASK_FP script.
 
   </task>
 
+<!--
+************************************************************************
+************************************************************************
+-->
+
 
   <task name="&JEDI_IC_GLM_TN;_#type#" cycledefs="#cycletype#"  maxtries="{{ maxtries_JEDI_IC_GLM }}">
 
@@ -794,10 +810,13 @@ MODULES_RUN_TASK_FP script.
   </task>
 
 {%- endif %}
--->
+
 
 
 {%- if do_jedi_aod_da %}
+<!--
+************************************************************************
+************************************************************************
 
 
   <task name="&VIIRS_TO_IODA_AOD_TN;_#type#" cycledefs="#cycletype#"  maxtries="{{ maxtries_VIIRS_to_ioda_aod }}">
@@ -824,12 +843,16 @@ MODULES_RUN_TASK_FP script.
     </dependency>
 
   </task>
+-->
 
+<!--
+************************************************************************
+************************************************************************
+-->
 
+  <task name="&JEDI_AOD_TN;_#type#" cycledefs="#cycletype#"  maxtries="{{ maxtries_JEDI_AOD }}">
 
-  <task name="&JEDI_AOD_TN;_#type#" cycledefs="#cycletype#"  maxtries="{{ maxtries_JEDI_lightning }}">
-
-    <command>&LOAD_MODULES_RUN_TASK_FP; "JEDI_AOD" "&JOBSdir;/JRRFS_ioda_aod.sh"</command>
+    <command>&LOAD_MODULES_RUN_TASK_FP; "JEDI_AOD" "&JOBSdir;/JRRFS_fv3jedi_aod.sh"</command>
 
     &RSRV_DEFAULT;
     <nodes>{{ nnodes_JEDI_AOD }}:ppn={{ ppn_JEDI_AOD }}</nodes>
@@ -841,25 +864,60 @@ MODULES_RUN_TASK_FP script.
 
     <envar><name>GLOBAL_VAR_DEFNS_FP</name><value>&GLOBAL_VAR_DEFNS_FP;</value></envar>
     <envar><name>ANL_TIME</name><value><cyclestr>@Y@m@d@H@M</cyclestr></value></envar>
-    <envar><name>LX</name><value>20</value></envar>
-    <envar><name>LY</name><value>20</value></envar>
+    <envar><name>LX</name><value>12</value></envar>
+    <envar><name>LY</name><value>10</value></envar>
     <envar><name>WORK_DIR</name><value><cyclestr>&CYCLE_BASEDIR;/@Y@m@d@H/FV3JEDI_#type#/@M</cyclestr></value></envar>
     <envar><name>FV3JEDI_BINDIR</name><value>&FV3JEDI_BINDIR;</value></envar>
     <envar><name>NML_TMP</name><value>GSL_fv3input_for_aod_template</value></envar>
     <envar><name>BKG_ROOT</name><value><cyclestr>&CYCLE_BASEDIR;/@Y@m@d@H</cyclestr></value></envar>
-    <envar><name>VIIRS_AOD_OBS_FN</name><value><cyclestr>&CYCLE_BASEDIR;/@Y@m@d@H/VIIRS_IODA_AOD/@M/aod_viirs_@Y@m@d@H_@M@S00_iodav3.nc</cyclestr></value></envar>
+    <envar><name>VIIRS_AOD_OBS_FN</name><value><cyclestr>/lfs5/BMC/wrfruc/bjallen/JEDI-AOD/Park_VIIRS_IODA_sd/ioda/VIIRS_AOD_@Y@m@d@H_medhighConf_medhighQC_0p75thin_nesdis_maskout_IODA.nc</cyclestr></value></envar>
     <envar><name>MODULE_FILE</name><value>&JEDI_MODULES;</value></envar>
     <envar><name>RRFSE_BKG_ROOT</name><value><cyclestr offset="-1:00:00">&RRFSE_FG_ROOT;/@Y@m@d@H</cyclestr></value></envar>
-    <envar><name>FV3JEDI_DIAG_FN</name><value><cyclestr>jedi_viirs_aod_diag_@Y@m@d@H@M.nc</cyclestr></value></envar>
+    <envar><name>FV3JEDI_DIAG_FN</name><value><cyclestr>jedi_aod_diag_@Y@m@d@H@M.nc</cyclestr></value></envar>
     <envar><name>FV3JEDI_AOD_DESC</name><value>AOD</value></envar>
     <envar><name>FV3FCST_TYPE</name><value>#type#</value></envar>
+
+    <dependency>
+       <taskdep task="&POSTANAL_TN;_#type#"/>
+    </dependency>
+
+  </task>
+
+<!--
+************************************************************************
+************************************************************************
+-->
+
+  <task name="&JEDI_IC_AOD_TN;_#type#" cycledefs="#cycletype#"  maxtries="{{ maxtries_JEDI_IC_AOD }}">
+
+    &RSRV_DEFAULT;
+    &WALL_LIMIT_ANALYSIS;
+
+    <command>&LOAD_MODULES_RUN_TASK_FP; "JEDI_IC_AOD" "&JOBSdir;/JRRFS_modify_ICs_aod.sh"</command>
+    <cores>{{ ncores_JEDI_IC_AOD }}</cores>
+    <native>--exclusive</native>
+    &NATIVE_ALL;
+    <walltime>&WALLTIME_PROC_AOD;</walltime>
+    &NODESIZE_ALL;
+    <jobname>&TAG;_&JEDI_IC_AOD_TN;_#type#</jobname>
+    <join><cyclestr>&LOGDIR;/&JEDI_IC_AOD_TN;_#type#_&TAG;_@Y@m@d@H.log</cyclestr></join>
+
+    <envar><name>GLOBAL_VAR_DEFNS_FP</name><value>&GLOBAL_VAR_DEFNS_FP;</value></envar>
+    <envar><name>ATIME</name><value><cyclestr>@Y@m@d@H@M</cyclestr></value></envar>
+    <envar><name>JEDI_DIR</name><value><cyclestr>&CYCLE_BASEDIR;/@Y@m@d@H/FV3JEDI_#type#/@M</cyclestr></value></envar>
+    <envar><name>PREFIX</name><value>aod</value></envar>
+    <envar><name>DEST_DIR</name><value>&CYCLE_BASEDIR;/<cyclestr>@Y@m@d@H</cyclestr></value></envar>
+    <envar><name>NWGES_ROOT_M1H</name><value>&NWGES_BASEDIR;/<cyclestr offset="-01:00:00">@Y@m@d@H</cyclestr></value></envar>
+    <envar><name>CYCLE_TYPE</name><value>#type#</value></envar>
+
+    <dependency>
+       <taskdep task="&JEDI_AOD_TN;_#type#"/>
+    </dependency>
 
   </task>
 
 
-
 {%- endif %}
--->
 
 {%- if do_glmfed_da %}
 

@@ -92,8 +92,8 @@ if [[ $DO_RETRO == "TRUE" ]] ; then
       GLMFED_WEST_ROOT=${RETRODATAPATH}/sat/noaaport/goes-west/glm/tiled
     fi
     
-    FV3JEDI_BINDIR_FP="/lfs5/BMC/wrfruc/bjallen/JEDI-AOD/RDASapp/build/bin"
-    JEDI_MODULES_FP="/lfs5/BMC/wrfruc/bjallen/JEDI-AOD/modulefile.skylab6.rocky8-spack1.6.0"
+    FV3JEDI_BINDIR_FP="/lfs5/BMC/wrfruc/bjallen/JEDI-AOD/RDASApp/build/bin"
+    JEDI_MODULES_FP="/lfs5/BMC/wrfruc/bjallen/JEDI-AOD/modulefile.rdas"
 
     EXTRN_MDL_SOURCE_BASEDIR_ICS=/lfs5/BMC/wrfruc/bjallen/JEDI-AOD/RAP_IC_LBC
     EXTRN_MDL_SOURCE_BASEDIR_LBCS=/lfs5/BMC/wrfruc/bjallen/JEDI-AOD/RAP_IC_LBC
