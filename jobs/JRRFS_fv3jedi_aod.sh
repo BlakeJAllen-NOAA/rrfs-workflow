@@ -34,9 +34,6 @@
 
 source ${MODULE_FILE}
 
-ulimit -s unlimited
-ulimit -a
-
 
 # don't do JEDI AOD on cold start
 hour=${ANL_TIME:8:2}
@@ -46,10 +43,10 @@ if [[ ${hour} -eq "03" ]] || [[ ${hour} -eq "15" ]]; then
   fi
 fi
 
-# don't JEDI AOD if no IODA file exists for the current analysis time
+# don't JEDI AOD if no IODA file exists for the hour leading up to the current analysis time
 echo ${VIIRS_AOD_OBS_FN}
 if [[ ! -e ${VIIRS_AOD_OBS_FN} ]]; then
-   echo "No AOD IODA file exists for this time"
+   echo "No AOD IODA file exists for this time minus one hour"
    exit 0
 fi
 
