@@ -136,7 +136,7 @@ fi
 # Choose the appropriate file template for graphics type
 net4=$(echo ${NET:0:4} | tr '[:upper:]' '[:lower:]')
 if [ ${PREDEF_GRID_NAME} = "RRFS_CONUS_3km" ]; then
-  gridname="conus_3km."
+  gridname=""
 elif  [ ${PREDEF_GRID_NAME} = "RRFS_NA_3km" ]; then
   gridname=""
 fi
